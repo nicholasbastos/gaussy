@@ -84,3 +84,17 @@ def redirect_url(short_url):
     db.session.commit()
     return redirect(url_entry.long_url)
 
+# Helpers
+def get_client_ip():
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
+    return ip
+
+def get_browser_info():
+    return request.user_agent.string
+
+# Main
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
