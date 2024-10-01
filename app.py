@@ -67,3 +67,20 @@ def shorten_url():
     db.session.commit()
     return jsonify({"short_url": short_url}), 201
 
+# Redirect based on short URL
+@app.route('/<short_url>', methods=['GET'])
+def redirect_url(short_url):
+    ip_address = get_client_ip()
+    browser = get_browser_info()
+
+    url_entry = URL.query.filter_by(short_url=short_url).first()
+
+    if not url_entry:
+        return jsonify({"error": "URL not found"}), 404
+    
+    url_entry.access_count += 1
+    analytics_record = URLAnalytics(url_id=url_entry.id, ip_address=ip_address, browser=browser)
+    db.session.add(analytics_record)
+    db.session.commit()
+    return redirect(url_entry.long_url)
+
