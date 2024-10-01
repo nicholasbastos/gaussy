@@ -23,7 +23,7 @@ You can test the application using `curl`. Here are some examples:
 1. **Shorten a URL**:
 
 ```bash
-curl -X POST http://localhost:5000/shorten -H "Content-Type: application/json" -d '{"long_url": "https://https://www.gaussy.com/company"}'
+curl -X POST http://localhost:5000/shorten -H "Content-Type: application/json" -d '{"long_url": "https://www.gaussy.com/company"}'
 ```
 
 2. **Access the shortened URL**:
