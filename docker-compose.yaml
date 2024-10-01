@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  flask:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    command: python app.py
+    container_name: gaussy-container
+
+  db:
+    image: nouchka/sqlite3
+    volumes:
+      - .:/app
+    container_name: db-container
+    stdin_open: true
+    tty: true
