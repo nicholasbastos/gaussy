@@ -36,3 +36,34 @@ class URLAnalytics(db.Model):
 
 with app.app_context():
     db.create_all()
+
+# Generate Short URL
+def generate_short_url(long_url):
+    hash_object = hashlib.sha256(long_url.encode())
+    short_url = base64.urlsafe_b64encode(hash_object.digest()[:4]).decode('utf-8')
+    return short_url
+
+@app.route('/shorten', methods=['POST'])
+def shorten_url():
+    data = request.json
+    long_url = data.get('long_url')
+
+    if not long_url or not re.match(url_pattern, long_url):
+        return jsonify({"error": "Invalid URL format"}), 400
+
+    ip_address = get_client_ip()
+    browser = get_browser_info()
+
+    existing_url = URL.query.filter_by(long_url=long_url).first()
+
+    if existing_url:
+        existing_url.creation_attempts += 1
+        db.session.commit()
+        return jsonify({"short_url": existing_url.short_url})
+
+    short_url = generate_short_url(long_url)
+    new_url = URL(long_url=long_url, short_url=short_url, creation_attempts=1)
+    db.session.add(new_url)
+    db.session.commit()
+    return jsonify({"short_url": short_url}), 201
+
